@@ -4,10 +4,12 @@
 \name{cbcity}
 \alias{cbcity}
 \title{A list of the current color palettes}
-\format{\code{data.frame} with the palette type, the palette name, the palette number string,
-and the palette number}
+\format{\code{data.frame} with
+the palette type (\code{pal.type}),
+the palette name (\code{pal.name}), and
+the number of colors in that palette (\code{pal.n}).}
 \source{
-Parsed from links on
+These data were parsed from hyperlinks found on
 \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/seq/index.html},
 \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/div/index.html}, and
 \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/qual/index.html}
@@ -21,6 +23,6 @@ summary(cbcity)
 subset(cbcity, pal.name=="Set1")
 }
 \seealso{
-\code{\link{cpt}}
+\code{\link{list_cpt}}; \code{\link{cb.city}}
 }
 

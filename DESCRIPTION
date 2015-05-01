@@ -15,5 +15,7 @@ Url: https://github.com/abarbour/cb.city for package development, and
 BugReports: https://github.com/abarbour/cb.city/issues
 Depends: R (>= 2.14.0), grDevices
 Imports: httr
-Suggests: testthat, RColorBrewer
+Suggests: testthat, RColorBrewer,
+    knitr, magrittr, reshape2
 LazyData: true
+VignetteBuilder: knitr

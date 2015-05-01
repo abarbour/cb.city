@@ -6,11 +6,14 @@
 \alias{cb.city-package}
 \title{Cynthia Brewer's palettes at cpt-city}
 \description{
-This package provides accress to Cynthia Brewer's sequential, divergent, and qualitative palettes online
-at cpt-city [1].  For guidance as to which palette type to use, refer to [2].
+This package provides accress to Cynthia Brewer's sequential, divergent, and qualitative palettes found online
+at cpt-city [1].  It is important to choose a palette appropriate for the data, and
+guidance as to which palette to use can be found at \url{http://colorbrewer2.org/}.
 }
 \details{
-The main functions to use are \code{\link{read_cpt}} and \code{\link{cpt}}.
+The main functions to use are \code{\link{cpt}} and \code{\link{read_cpt}}, but there is also
+a convenience function \code{\link{city_palette}} to get a palette in one step.
+
 You can use \code{\link{list_cpt}} to see all possible palettes (references built-in table \code{\link{cbcity}}).
 }
 \examples{
@@ -24,12 +27,8 @@ A.J. Barbour
 }
 \references{
 [1]: \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/}
-
-[2]: \url{http://colorbrewer2.org/}
 }
 \seealso{
-\code{\link{cpt}} and \code{\link{read_cpt}} are responsible
-for downloading the actual palettes, and \code{\link{get_cpt}} is a convenience function
-which marries the two functions.
+\code{\code{\link{list_cpt}}, \link{cpt}}, \code{\link{read_cpt}}, and \code{\link{city_palette}}
 }
 

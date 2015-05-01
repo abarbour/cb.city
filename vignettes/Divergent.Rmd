@@ -1,0 +1,97 @@
+---
+title: "Divergent color palettes"
+author: "Andrew J Barbour"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cpt-city/cb: divergent color palettes}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo=FALSE}
+library(cb.city)
+```
+Divergent color palettes should be used when the range of values is centered on some breakpoint -- zero, for example -- implying
+a difference or relative value. This would be appropriate for plotting model residuals, for example. 
+The suite of color palettes currently available, by name, is
+
+```{r, echo=FALSE, results='asis'}
+library(reshape2)
+all.div <- list_cpt(pal.type=='div')
+tbl <- dcast(all.div, pal.name ~ pal.n, 
+             value.var='pal.n',
+             fun.aggregate = function(x){lx <- length(x); as.character(ifelse(lx==1,TRUE,lx))}, margins = TRUE)
+knitr::kable(tbl)
+```
+
+where the top number gives the number of colors in the palette, and `TRUE` indicates the palette (named to the far left)
+is capable of that many colors.
+The columns on the far-right and bottom show counts of the number of `TRUE` variants of that given row or column.
+
+## What do these palettes look like?
+
+Since there is some cost associated with downloading the palettes, here are all
+of the length-11 palettes:
+
+```{r, echo=FALSE, fig.show='hold', fig.width=5.5}
+nt <- 11
+cseq <- seq_len(nt)
+PLT <- function(pal.name, pal.n=nt, ...){
+  cc. <- city_palette(pal.name, pal.n)
+  plot(cc., ax=axis(1, at=cseq), ...)
+  as.vector(cc.)
+}
+pals <- unique(all.div$pal.name)
+layout(matrix(seq_len(length(pals))))
+par(mar=c(0,4,0,0), oma=c(3,2,1,1), las=1)
+Cols <- as.data.frame(t(sapply(pals, PLT)))
+names(Cols) <- cseq
+```
+
+and a table of the hexidecimal codes:
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(Cols)
+```
+
+## Some examples
+
+The red-to-blue (through white) is a classic palette that is highly effective.
+Use `city_palette` to quickly retrieve the 
+color palette^[Remember: the result will be a `cpt.cols` object, so use `as.vector` or another method coercion to extract
+the color codes!]
+```{r, echo=TRUE, results='asis'}
+cpal <- city_palette("RdBu",11)
+```
+
+Here are two illustrations using that palette^[The `plot.cpt.cols` method is used to create the color scalebars.]: one is 
+a pattern found by $\sin(x) + \cos(y)$,
+and the other a more interesting pattern based on the [$\mathrm{sinc}$ function](http://mathworld.wolfram.com/SincFunction.html):
+```{r, echo=FALSE, fig.show='hold', fig.width=7, fig.height=4}
+layout(matrix(c(1,2,1,2,1,2,1,2,3,4), nrow=5, byrow=TRUE))
+
+par(mar=c(0,0.1,1,0.1), oma=c(0,0,0,0))
+
+sines <- function(x, y){sin(x*pi/180)/2 + cos(y*pi/180)/2}
+image(outer(0:180, 0:180, FUN = sines), col=as.vector(cpal), axes=FALSE, zlim=c(-1,1), asp=1)
+mtext("A sum of sinusoids", side=3, line=0.)
+
+sinc <- function(x,y){
+  r. <- sqrt(x**2 + y**2) + .Machine$double.eps;
+  sin(r.)/r.
+}
+x <- y <- seq(-10,10,by=0.1)
+image(outer(x, y, FUN = sinc), col=as.vector(cpal), axes=FALSE, zlim=c(-1,1), asp=1)
+mtext("the sinc function", side=3, line=0.)
+
+par(mar=c(3,4,1,4))
+plot(cpal, ax=axis(1, at=c(1,6,11), labels=c(-1,0,1)), ylab="")
+plot(cpal, ax=axis(1, at=c(1,6,11), labels=c(-1,0,1)), ylab="")
+```
+
+The diverging color palette makes it easy for the brain to distinguish highs and lows, and to compare their size
+relative to zero.
+
+In these examples 
+

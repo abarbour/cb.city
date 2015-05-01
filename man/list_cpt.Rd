@@ -10,24 +10,44 @@
 list_cpt(...)
 }
 \arguments{
-\item{...}{additional parameters to \code{\link{subset}}}
+\item{...}{additional parameters to \code{\link{subset}}; see \code{\link{cbcity}}}
 }
 \description{
-List all possible color palettes
-}
-\details{
 List all possible color palettes available on cpt-city since the last package update
 }
+\details{
+Uses the table in \code{\link{cbcity}} as a 'current' list.
+}
 \examples{
-head(list_cpt())
-list_cpt(pal.n=="8")
+## Show the full list
+list_cpt()
+
+##  Subsets of the listing
+names(cbcity)
+# [1] "pal.type" "pal.name" "pal.n"
+
+#   any palette of length 8
+list_cpt(pal.n==8)
+#   any palette with the name 'Set1'
 list_cpt(pal.name=="Set1")
 
+## Tabulate the palette names for convenience
+getOption('cb.city.ops')[['cb.url.exts']]
+# or just
+unique(cbcity$pal.type)
+# [1] "seq"  "div"  "qual"
+
+# Diverging:
 with(list_cpt(pal.type=='div'), table(pal.name))
+
+# Sequential:
 with(list_cpt(pal.type=='seq'), table(pal.name))
+
+# Qualitative:
 with(list_cpt(pal.type=='qual'), table(pal.name))
 }
 \seealso{
-\code{\link{cbcity}} for the current list, and \code{\link{read_cpt}} or \code{\link{get_cpt}} to get a specific palette
+\code{\link{cpt}} and \code{\link{read_cpt}}, or just \code{\link{city_palette}} to
+download and read-in a specific palette from this list.
 }
 

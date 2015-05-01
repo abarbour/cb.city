@@ -1,17 +1,40 @@
 #' List all possible color palettes
-#' @details List all possible color palettes available on cpt-city since the last package update
+#' @description List all possible color palettes available on cpt-city since the last package update
+#' @details Uses the table in \code{\link{cbcity}} as a 'current' list.
 #' @source \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/}
 #' @export
-#' @param ... additional parameters to \code{\link{subset}}
-#' @seealso \code{\link{cbcity}} for the current list, and \code{\link{read_cpt}} or \code{\link{get_cpt}} to get a specific palette
+#' @param ... additional parameters to \code{\link{subset}}; see \code{\link{cbcity}}
+#' @seealso \code{\link{cpt}} and \code{\link{read_cpt}}, or just \code{\link{city_palette}} to 
+#' download and read-in a specific palette from this list.
 #' @examples
-#' head(list_cpt())
-#' list_cpt(pal.n=="8")
+#' 
+#' ## Show the full list
+#' list_cpt()
+#' 
+#' ##  Subsets of the listing
+#' names(cbcity)
+#' # [1] "pal.type" "pal.name" "pal.n" 
+#' 
+#' #   any palette of length 8
+#' list_cpt(pal.n==8)
+#' #   any palette with the name 'Set1'
 #' list_cpt(pal.name=="Set1")
 #' 
+#' ## Tabulate the palette names for convenience
+#' getOption('cb.city.ops')[['cb.url.exts']]
+#' # or just 
+#' unique(cbcity$pal.type)
+#' # [1] "seq"  "div"  "qual"
+#' 
+#' # Diverging:
 #' with(list_cpt(pal.type=='div'), table(pal.name))
+#' 
+#' # Sequential:
 #' with(list_cpt(pal.type=='seq'), table(pal.name))
+#' 
+#' # Qualitative:
 #' with(list_cpt(pal.type=='qual'), table(pal.name))
+#' 
 list_cpt <- function(...){
   ne <- new.env()
   data('cbcity', package='cb.city', envir=ne)
@@ -23,23 +46,34 @@ list_cpt <- function(...){
 #' A \code{'cpt'} object contains the information necessary to
 #' download the color palette from cpt-city using \code{\link{read_cpt}}.
 #' @details
+#' Use \code{\link{list_cpt}} to see all available options for the
+#' \code{name} and \code{number} arguments
+#' 
 #' Setting \code{check.url=TRUE} can add a bit
 #' of time, since cpt-city servers have relatively long response times, but 
 #' doing so can save time downstream.
-#' @param name character; the palette name (case sensitive)
-#' @param number character or integer; the palette number
-#' @param check.url logical; should the status of cpt's url be tested? 
+#' 
+#' @param name character; the palette name (case sensitives)
+#' @param number character or integer; the palette number; this depends on \code{name}
+#' @param check.url logical; should the status of the url of the color palette be tested?
 #' @export
-#' @seealso \code{\link{read_cpt}} or \code{\link{get_cpt}} to download the colors, and \code{\link{list_cpt}}
-#' to see all available options for \code{name} and \code{number}
-#' @return An object with class \code{'cpt'} with metadata for the palette
+#' @seealso \code{\link{read_cpt}} to download the colors
+#' @return A \code{\link{cpt-class}} object
 #' @examples
 #' \dontrun{
-#' cpt('OrRd',5)
+#' 
+#' Pal <- 'OrRd' # Orange to red 
+#' 
+#' # See what options there are
+#' list_cpt(pal.name == Pal)
+#' 
+#' #lets get the length-five version
+#' n <- 5
+#' cpt(Pal, n)
 #' 
 #' # Uses an internal check to make sure palettes do exist
-#' try(cpt('OrangeRed',5)) #fails because the palette name is wrong
-#' try(cpt('OrRd',999)) #fails becayse there isnt an OrRd variant with that many colors
+#' try(cpt('OrangeRed', n)) # fails because the palette name is invalid
+#' try(cpt(Pal, 999)) # fails because there isn't a variant of OrRd with that many colors
 #' }
 cpt <- function(name, number, check.url=TRUE){
   
@@ -69,25 +103,6 @@ cpt <- function(name, number, check.url=TRUE){
 
 #' @rdname cpt
 #' @export
-print.cpt <- function(x, ...){
-  u <- x[['cpt.url']]
-  u.s <- x[['cpt.url.status']]
-  u.s <- if (is.na(u.s)){
-    "unchecked"
-  } else {
-    ifelse(u.s, "ok", "missing")
-  }
-  cat(
-    paste("cpt-city/cb palette: 'cpt' object",
-          paste0("       Name:  ", x[['pal.name']]),
-          paste0("     Number:  ", x[['pal.n']]),
-          paste0("        Url:  ", u),
-          paste0(" Url-status:  ", toupper(u.s)), sep="\n")
-  )
-  invisible(u)
-}
-
-#' @rdname cpt
 #' @param error logical; If \code{TRUE}, an error is signalled; if \code{FALSE}, only a warning is given.
 .check_cpt_list <- function(name, number, error=TRUE){
   
@@ -96,6 +111,8 @@ print.cpt <- function(x, ...){
   cbcity <- list_cpt()
   
   stopifnot(exists("cbcity"))
+  
+  pal.name <- pal.n <- NULL
   
   Cpts <- subset(cbcity, pal.name == name)
   nCpts <- subset(Cpts, pal.n == number)
@@ -132,10 +149,9 @@ print.cpt <- function(x, ...){
 #' @param x an object to read in
 #' @param ... additional parameters to \code{\link{read.table}}
 #' @source \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/notes/formats.html}
-#' @return An object with class \code{\link{cpt.cols}} with the color palette, and other metadata
+#' @return A \code{\link{cpt.cols-class}} object
 #' @export
-#' @seealso \code{\link{get_cpt}} and \code{\link{cpt}}; \code{\link{list_cpt}} will show
-#' all available palettes.
+#' @seealso \code{\link{cpt}}, and \code{\link{city_palette}}, a convenience function used to download the palette in one step
 #' @examples
 #' \dontrun{
 #' 
@@ -170,76 +186,45 @@ read_cpt.cpt <- function(x, ...){
   return(cptcols)
 }
 
-#' Methods for the 'cpt.cols' class
-#' @param x an object with class 'cpt.cols' 
-#' @name cpt.cols
-NULL
-
-#' @rdname cpt.cols
-#' @export
-as.character.cpt.cols <- function(x, ...){
-  as.character(x[['cols']], ...)
-}
-
-#' @rdname cpt.cols
-#' @export
-as.vector.cpt.cols <- as.character.cpt.cols
-
-#' @rdname cpt.cols
-#' @export
-length.cpt.cols <- function(x) x[['num.cols']]
-
-#' @rdname cpt.cols
-#' @export
-data.frame.cpt.cols <- function(x, ...){
-  data.frame(col.num = seq_len(length(x)), cols=as.character(x))
-}
-
-#' @rdname cpt.cols
-#' @export
-as.data.frame.cpt.cols <- data.frame.cpt.cols
-
-#' @rdname cpt.cols
-#' @export
-print.cpt.cols <- function(x, ...){
-  cat(
-    paste("cpt-city/cb palette: 'cpt.cols' object",
-          paste0("       Type:  ", x[['type']]),
-          paste0("       Name:  ", x[['name']]),
-          paste0("     Number:  ", length(x)), "", sep="\n")
-  )
-  print(as.character(x))
-}
-
 #' Convenience function to quickly get a color palette
-#' @details This uses \code{\link{read_cpt}} and \code{\link{cpt}} to
-#' return the color palette desired.
+#' @description 
+#' Return a color palette which can be used for plotting,
+#' with a single command
+#' @details
+#' This function uses \code{\link{read_cpt}} and \code{\link{cpt}}.
 #' @export
 #' @inheritParams cpt
+#' @param ... additional arguments to \code{\link{read_cpt}}
+#' @return A \code{\link{cpt.cols-class}} object
+#' @seealso \code{\link{read_cpt}}
 #' @examples
 #' \dontrun{
-#' as.character(get_cpt('OrRd',5))
+#' # Say we wanted to get a sequential palette of oranges to reds
+#' Pal <- 'OrRd'
+#' n <- 5
+#' 
+#' # The most direct way is:
+#' p.a <- city_palette(Pal, n)
+#' 
+#' # careful, though, this isnt a vector
+#' str(p.a)
+#' # It can be coerced to one though:
+#' as.character(p.a)
+#' # or
+#' as.vector(p.a)
+#' 
+#' # The 'long' way to get the palette:
+#' p.b <- read_cpt(cpt(Pal, n))
+#' 
+#' # ... should yield the same result as the short way:
+#' try(identical(p.a, p.b))
+#' 
+#' # Take a look:
+#' layout(matrix(1:2))
+#' plot(p.a)
+#' plot(p.b)
+#' 
 #' }
-get_cpt <- function(name, number){
-  read_cpt(cpt(name, number, FALSE))
-}
-
-#' @rdname cpt.cols
-#' @export
-#' @param x an object of class \code{\link{cpt.cols}}
-#' @param n.total integer; currently unused
-#' @param ax statements which draw \code{\link{axes}} on the color axis. 
-#' This overrides the default axes which are simply an index of color numbers
-plot.cpt.cols <- function(x, n.total=length(x), ax=NULL, ...){
-  palnm <- x[['name']]
-  cpal <- x[['cols']]
-  cseq <- seq_along(cpal)
-  image(x = cseq, z = matrix(cseq), col=cpal, xlab="", ylab="", yaxt="n", xaxt="n", ...)
-  if (is.null(ax)){
-    axis(1)
-  } else {
-    ax
-  }
-  mtext(palnm, side=2, line=0.2)
-  return(invisible(cpal))
+city_palette <- function(name, number, ...){
+  read_cpt(cpt(name, number, check.url = FALSE), ...)
 }

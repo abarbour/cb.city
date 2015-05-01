@@ -18,7 +18,7 @@ read_cpt(x, ...)
 \item{...}{additional parameters to \code{\link{read.table}}}
 }
 \value{
-An object with class \code{\link{cpt.cols}} with the color palette, and other metadata
+A \code{\link{cpt.cols-class}} object
 }
 \description{
 Download and read-in a cpt-city color palette
@@ -40,7 +40,6 @@ plot(c.7, ax=axis(1, at=1:7, labels=letters[1:7]))
 }
 }
 \seealso{
-\code{\link{get_cpt}} and \code{\link{cpt}}; \code{\link{list_cpt}} will show
-all available palettes.
+\code{\link{cpt}}, and \code{\link{city_palette}}, a convenience function used to download the palette in one step
 }
 

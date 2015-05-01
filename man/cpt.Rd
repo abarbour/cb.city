@@ -3,47 +3,54 @@
 \name{cpt}
 \alias{.check_cpt_list}
 \alias{cpt}
-\alias{print.cpt}
 \title{Create a cpt object}
 \usage{
 cpt(name, number, check.url = TRUE)
 
-\method{print}{cpt}(x, ...)
-
 .check_cpt_list(name, number, error = TRUE)
 }
 \arguments{
-\item{name}{character; the palette name (case sensitive)}
+\item{name}{character; the palette name (case sensitives)}
 
-\item{number}{character or integer; the palette number}
+\item{number}{character or integer; the palette number; this depends on \code{name}}
 
-\item{check.url}{logical; should the status of cpt's url be tested?}
+\item{check.url}{logical; should the status of the url of the color palette be tested?}
 
 \item{error}{logical; If \code{TRUE}, an error is signalled; if \code{FALSE}, only a warning is given.}
 }
 \value{
-An object with class \code{'cpt'} with metadata for the palette
+A \code{\link{cpt-class}} object
 }
 \description{
 A \code{'cpt'} object contains the information necessary to
 download the color palette from cpt-city using \code{\link{read_cpt}}.
 }
 \details{
+Use \code{\link{list_cpt}} to see all available options for the
+\code{name} and \code{number} arguments
+
 Setting \code{check.url=TRUE} can add a bit
 of time, since cpt-city servers have relatively long response times, but
 doing so can save time downstream.
 }
 \examples{
 \dontrun{
-cpt('OrRd',5)
+
+Pal <- 'OrRd' # Orange to red
+
+# See what options there are
+list_cpt(pal.name == Pal)
+
+#lets get the length-five version
+n <- 5
+cpt(Pal, n)
 
 # Uses an internal check to make sure palettes do exist
-try(cpt('OrangeRed',5)) #fails because the palette name is wrong
-try(cpt('OrRd',999)) #fails becayse there isnt an OrRd variant with that many colors
+try(cpt('OrangeRed', n)) # fails because the palette name is invalid
+try(cpt(Pal, 999)) # fails because there isn't a variant of OrRd with that many colors
 }
 }
 \seealso{
-\code{\link{read_cpt}} or \code{\link{get_cpt}} to download the colors, and \code{\link{list_cpt}}
-to see all available options for \code{name} and \code{number}
+\code{\link{read_cpt}} to download the colors
 }
 
