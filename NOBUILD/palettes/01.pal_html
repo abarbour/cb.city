@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+curl --silent http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/seq/index.html | grep "alt=" > tmp.seq
+curl --silent http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/div/index.html | grep "alt=" > tmp.div
+curl --silent http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/qual/index.html | grep "alt=" > tmp.qual
+
+cat << XXX > /tmp/tmp.fawk
+{
+	gsub("\\047","")
+	gsub("alt=","")
+	printf"%s\\t%s\\t%s\\n", ptype, \$4, \$5
+}
+XXX
+cat << XXX
+#
+#	Available cpt-city/cb palettes
+#	`date`
+#
+pal.type pal.name pal.num
+XXX
+cat tmp.seq | awk -v ptype="seq" -f /tmp/tmp.fawk
+cat tmp.div | awk -v ptype="div" -f /tmp/tmp.fawk
+cat tmp.qual | awk -v ptype="qual" -f /tmp/tmp.fawk
