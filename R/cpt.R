@@ -3,7 +3,7 @@
 #' @source \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/}
 #' @export
 #' @param ... additional parameters to \code{\link{subset}}
-#' @seealso \code{\link{cbcity}} for the current list, and \code{\link{read_cptcity}} or \code{\link{get_cpt}} to get a specific palette
+#' @seealso \code{\link{cbcity}} for the current list, and \code{\link{read_cpt}} or \code{\link{get_cpt}} to get a specific palette
 #' @examples
 #' head(list_cpt())
 #' list_cpt(pal.n=="8")
@@ -19,6 +19,9 @@ list_cpt <- function(...){
 }
 
 #' Create a cpt object
+#' @description
+#' A \code{'cpt'} object contains the information necessary to
+#' download the color palette from cpt-city using \code{\link{read_cpt}}.
 #' @details
 #' Setting \code{check.url=TRUE} can add a bit
 #' of time, since cpt-city servers have relatively long response times, but 
@@ -27,7 +30,7 @@ list_cpt <- function(...){
 #' @param number character or integer; the palette number
 #' @param check.url logical; should the status of cpt's url be tested? 
 #' @export
-#' @seealso \code{\link{read_cptcity}} or \code{\link{get_cpt}} to download the colors, and \code{\link{list_cpt}}
+#' @seealso \code{\link{read_cpt}} or \code{\link{get_cpt}} to download the colors, and \code{\link{list_cpt}}
 #' to see all available options for \code{name} and \code{number}
 #' @return An object with class \code{'cpt'} with metadata for the palette
 #' @examples
@@ -46,8 +49,8 @@ cpt <- function(name, number, check.url=TRUE){
   
   # setup the url
   ops <- getOption('cb.city.ops')
-  base.url <- ops[['base.url']]
-  cu <- with(cptdf, sprintf("%s/%s/%s_%02i.cpt", base.url, pal.type, pal.name, pal.n))
+  cb.url <- ops[['cb.url']]
+  cu <- with(cptdf, sprintf("%s/%s/%s_%02i.cpt", cb.url, pal.type, pal.name, pal.n))
   # and check if desired
   cu.status <- ifelse(check.url, httr::url_ok(cu), NA)
   
@@ -56,7 +59,6 @@ cpt <- function(name, number, check.url=TRUE){
     pal.name = name,
     pal.n = number,
     pal.tbl = cptdf,
-    # http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/seq/Blues_04.cpt
     cpt.url = cu,
     cpt.url.status = cu.status
   )
@@ -130,15 +132,15 @@ print.cpt <- function(x, ...){
 #' @param x an object to read in
 #' @param ... additional parameters to \code{\link{read.table}}
 #' @source \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/notes/formats.html}
-#' @return An object with class \code{'cpt.cols'} with the color palette, and other metadata
+#' @return An object with class \code{\link{cpt.cols}} with the color palette, and other metadata
 #' @export
 #' @seealso \code{\link{get_cpt}} and \code{\link{cpt}}; \code{\link{list_cpt}} will show
 #' all available palettes.
 #' @examples
 #' \dontrun{
 #' 
-#' c.5 <- read_cptcity(cpt('OrRd',5))
-#' c.7 <- read_cptcity(cpt('OrRd',7))
+#' c.5 <- read_cpt(cpt('OrRd',5))
+#' c.7 <- read_cpt(cpt('OrRd',7))
 #'
 #' layout(matrix(1:3))
 #' plot(c.5)
@@ -146,11 +148,11 @@ print.cpt <- function(x, ...){
 #' # specify the axes
 #' plot(c.7, ax=axis(1, at=1:7, labels=letters[1:7]))
 #' }
-read_cptcity <- function(x, ...) UseMethod("read_cptcity")
+read_cpt <- function(x, ...) UseMethod("read_cpt")
 
-#' @rdname read_cptcity
+#' @rdname read_cpt
 #' @export
-read_cptcity.cpt <- function(x, ...){
+read_cpt.cpt <- function(x, ...){
   ptbl <- x[['pal.tbl']]
   cu <- x[['cpt.url']]
   ustat <- x[['cpt.url.status']]
@@ -168,27 +170,49 @@ read_cptcity.cpt <- function(x, ...){
   return(cptcols)
 }
 
-#' @rdname read_cptcity
+#' Methods for the 'cpt.cols' class
+#' @param x an object with class 'cpt.cols' 
+#' @name cpt.cols
+NULL
+
+#' @rdname cpt.cols
 #' @export
 as.character.cpt.cols <- function(x, ...){
   as.character(x[['cols']], ...)
 }
 
-#' @rdname read_cptcity
+#' @rdname cpt.cols
+#' @export
+as.vector.cpt.cols <- as.character.cpt.cols
+
+#' @rdname cpt.cols
+#' @export
+length.cpt.cols <- function(x) x[['num.cols']]
+
+#' @rdname cpt.cols
+#' @export
+data.frame.cpt.cols <- function(x, ...){
+  data.frame(col.num = seq_len(length(x)), cols=as.character(x))
+}
+
+#' @rdname cpt.cols
+#' @export
+as.data.frame.cpt.cols <- data.frame.cpt.cols
+
+#' @rdname cpt.cols
 #' @export
 print.cpt.cols <- function(x, ...){
   cat(
     paste("cpt-city/cb palette: 'cpt.cols' object",
           paste0("       Type:  ", x[['type']]),
           paste0("       Name:  ", x[['name']]),
-          paste0("     Number:  ", x[['num.cols']]), "", sep="\n")
+          paste0("     Number:  ", length(x)), "", sep="\n")
   )
   print(as.character(x))
 }
 
-
 #' Convenience function to quickly get a color palette
-#' @details This uses \code{\link{read_cptcity}} and \code{\link{cpt}} to
+#' @details This uses \code{\link{read_cpt}} and \code{\link{cpt}} to
 #' return the color palette desired.
 #' @export
 #' @inheritParams cpt
@@ -197,12 +221,16 @@ print.cpt.cols <- function(x, ...){
 #' as.character(get_cpt('OrRd',5))
 #' }
 get_cpt <- function(name, number){
-  read_cptcity(cpt(name, number, FALSE))
+  read_cpt(cpt(name, number, FALSE))
 }
 
-#' @rdname read_cptcity
+#' @rdname cpt.cols
 #' @export
-plot.cpt.cols <- function(x, n.total=NULL, ax=NULL, ...){
+#' @param x an object of class \code{\link{cpt.cols}}
+#' @param n.total integer; currently unused
+#' @param ax statements which draw \code{\link{axes}} on the color axis. 
+#' This overrides the default axes which are simply an index of color numbers
+plot.cpt.cols <- function(x, n.total=length(x), ax=NULL, ...){
   palnm <- x[['name']]
   cpal <- x[['cols']]
   cseq <- seq_along(cpal)

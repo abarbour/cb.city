@@ -1,15 +1,19 @@
 Package: cb.city
 Type: Package
-Title: Access Palettes Offered by Cynthia Brewer at cpt-city
+Title: Access All of Cynthia Brewer's Color Palettes on cpt-city
 Version: 0.1.9999
 Date: 2015-04-30
 Author: Andrew J Barbour
 Maintainer: Andrew J Barbour <andy.barbour@gmail.com>
-Description: Cynthia Brewer has posted a wide range of color palettes on cpt-city. This offers a set of tools to access those palettes.
-License: Apache
-Url: https://github.com/abarbour/cb.city
+Description: cpt-city hosts a wide range of color palettes made by Cynthia Brewer et al., and this
+   offers the tools to download and import them into R.  The number of palettes available on cpt-city
+   if far greater than the number in RColorBrewer, the difference being this does not keep copies
+   of the palettes locally -- they must be downloaded.
+License: Apache License 2.0
+Url: https://github.com/abarbour/cb.city for package development, and
+   http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb for the cpt-city color palettes.
 BugReports: https://github.com/abarbour/cb.city/issues
-Depends: grDevices
+Depends: R (>= 2.14.0), grDevices
 Imports: httr
-Suggests: testthat
+Suggests: testthat, RColorBrewer
 LazyData: true
