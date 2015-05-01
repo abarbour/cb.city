@@ -1,0 +1,3 @@
+useDynLib(cb.city)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)

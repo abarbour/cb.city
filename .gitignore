@@ -7,7 +7,14 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+.Rproj.user
+.Rhistory
+.RData
+src/*.o
+src/*.so
+src/*.dll
