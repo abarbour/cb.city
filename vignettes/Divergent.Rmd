@@ -9,7 +9,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 library(cb.city)
 ```
 Divergent color palettes should be used when the range of values is centered on some breakpoint -- zero, for example -- implying
@@ -19,28 +19,36 @@ The suite of color palettes currently available, by name, is
 ```{r, echo=FALSE, results='asis'}
 library(reshape2)
 all.div <- list_cpt(pal.type=='div')
+#http://www.edlazorvfx.com/ysu/html/ascii.html
+shapes <- paste0("&#", c(10003, 9996, 9745, 9786, 9734, 9728), ";")
 tbl <- dcast(all.div, pal.name ~ pal.n, 
              value.var='pal.n',
-             fun.aggregate = function(x){lx <- length(x); as.character(ifelse(lx==1,TRUE,lx))}, margins = TRUE)
-knitr::kable(tbl)
+             fun.aggregate = function(x){lx <- length(x); as.character(ifelse(lx==1,sample(shapes,1),lx))}, margins = TRUE)
+knitr::kable(tbl, "markdown")
 ```
 
-where the top number gives the number of colors in the palette, and `TRUE` indicates the palette (named to the far left)
-is capable of that many colors.
+where the top number gives the number of colors in the palette, and a happy 
+character^[A happy character includes any of these: &#10003;, &#9996;, &#9745;, &#9786;, &#9734;, or &#9728;] 
+indicates the palette (named to the far left)
+has that many colors.
 The columns on the far-right and bottom show counts of the number of `TRUE` variants of that given row or column.
 
 ## What do these palettes look like?
 
-Since there is some cost associated with downloading the palettes, here are all
-of the length-11 palettes:
+Since there is some cost associated with downloading the palettes, here are just the length-11 palettes:
 
 ```{r, echo=FALSE, fig.show='hold', fig.width=5.5}
 nt <- 11
 cseq <- seq_len(nt)
+shake <- FALSE
 PLT <- function(pal.name, pal.n=nt, ...){
-  cc. <- city_palette(pal.name, pal.n)
-  plot(cc., ax=axis(1, at=cseq), ...)
-  as.vector(cc.)
+  if (shake){
+    letters[1:pal.n]
+  } else {
+    cc. <- city_palette(pal.name, pal.n)
+    plot(cc., ax=axis(1, at=cseq), ...)
+    as.vector(cc.)    
+  }
 }
 pals <- unique(all.div$pal.name)
 layout(matrix(seq_len(length(pals))))
@@ -51,7 +59,7 @@ names(Cols) <- cseq
 
 and a table of the hexidecimal codes:
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=FALSE, results='asis', size='small'}
 knitr::kable(Cols)
 ```
 
@@ -61,13 +69,21 @@ The red-to-blue (through white) is a classic palette that is highly effective.
 Use `city_palette` to quickly retrieve the 
 color palette^[Remember: the result will be a `cpt.cols` object, so use `as.vector` or another method coercion to extract
 the color codes!]
-```{r, echo=TRUE, results='asis'}
+```{r, echo=TRUE}
 cpal <- city_palette("RdBu",11)
 ```
+or, with RColorBrewer:
+```{r, echo=TRUE}
+cpal.rcb <- RColorBrewer::brewer.pal(11,"RdBu")
+print(all.equal(as.vector(cpal), cpal.rcb))
+```
 
-Here are two illustrations using that palette^[The `plot.cpt.cols` method is used to create the color scalebars.]: one is 
-a pattern found by $\sin(x) + \cos(y)$,
-and the other a more interesting pattern based on the [$\mathrm{sinc}$ function](http://mathworld.wolfram.com/SincFunction.html):
+
+From then on you can use the palette however you see fit. Here 
+are two illustrations using that palette^[The `plot.cpt.cols` method is
+used to create the color scalebars.]: one is a pattern found by $\sin(x) + \cos(y)$, and 
+the other a more interesting pattern based on 
+the [$\mathrm{sinc}$ function](http://mathworld.wolfram.com/SincFunction.html):
 ```{r, echo=FALSE, fig.show='hold', fig.width=7, fig.height=4}
 layout(matrix(c(1,2,1,2,1,2,1,2,3,4), nrow=5, byrow=TRUE))
 

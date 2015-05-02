@@ -168,6 +168,7 @@ read_cpt <- function(x, ...) UseMethod("read_cpt")
 
 #' @rdname read_cpt
 #' @export
+# Careful when attempting to extend this: Sometimes cpt files are not this easily readable
 read_cpt.cpt <- function(x, ...){
   ptbl <- x[['pal.tbl']]
   cu <- x[['cpt.url']]
@@ -175,12 +176,17 @@ read_cpt.cpt <- function(x, ...){
   wasnot.checked <- is.na(ustat)
   if (wasnot.checked) ustat <- httr::url_ok(cu)
   if (!ustat) stop("cpt does not exist on cpt-city")
-  cpal <- read.table(cu, header=FALSE, col.names = c("n","R","G","B","n2","R2","G2","B2"), ...)
+  # 0 R G B  1 R G B
+  # 1 R G B  2 R G B
+  # where in this case the second set is alwas equal to the first,
+  # and there is no "B,F,N" lines at the end
+  cpal <- read.table(cu, header=FALSE, col.names = c("level","R","G","B","level2","R2","G2","B2"), ...)
   cptcols <- list(
     type = ptbl$pal.type,
     name = ptbl$pal.name,
     num.cols = ptbl$pal.n,
-    cols = with(cpal[,1:4], grDevices::rgb(R, G, B, names=n, maxColorValue = 255))
+    pal.df = cpal,
+    cols = with(cpal, grDevices::rgb(R, G, B, names=level, maxColorValue = 255))
   )
   class(cptcols) <- 'cpt.cols'
   return(cptcols)
