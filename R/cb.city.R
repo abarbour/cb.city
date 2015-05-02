@@ -12,7 +12,7 @@
 #' @author A.J. Barbour
 #' @name cb.city
 #' @references [1]: \url{http://soliton.vm.bytemark.co.uk/pub/cpt-city/cb/}
-#' @seealso \code{\code{\link{list_cpt}}, \link{cpt}}, \code{\link{read_cpt}}, and \code{\link{city_palette}}
+#' @seealso \code{\link{list_cpt}}, \code{\link{cpt}}, \code{\link{read_cpt}}, and \code{\link{city_palette}}
 #' @examples
 #' \dontrun{
 #' head(list_cpt())
